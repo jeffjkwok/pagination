@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Dash</title>
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+</head>
+<body>
+	<form action='/' method='post'>
+		{% csrf_token %}
+		Name: <input type="text" name="name">
+		From: <input type="date" name="from">
+		To: <input type="date" name="to">
+	</form>
+	<div id='pages'>
+		<div id='page'>
+		{% for x in pages %}
+			<a href="">{{x}}</a>
+		{% endfor %}
+		</div>
+	</div>
+	<div id='table'>
+		<table>
+			<tr>
+				<th>Lead ID</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Register</th>
+				<th>Email</th>
+			</tr>
+			{% for user in users %}
+			<tr>
+				<td>{{user.id}}</td>
+				<td>{{user.first_name}}</td>
+				<td>{{user.last_name}}</td>
+				<td>{{user.created_at}}</td>
+				<td>{{user.email}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	<input type="hidden" name="page" value="">
+</body>
+	<script type="text/javascript">
+		var page; 
+
+		$(document.body).on('click', 'a', function(e){
+			e.preventDefault();
+			page = $(this).html()
+			console.log(page)
+			filter();
+		})
+
+		function filter(){
+			$('form').append('<input type="hidden" name="page" value="'+page+'">')
+			$.ajax({
+				url:'/',
+				method: 'post',
+				data: $('form').serialize(),
+				success: function(data){
+					$('#pages').html($(data).find('#page'));
+					$('#table').html($(data).find('table'));
+					console.log(data)
+
+				}
+			})
+		}
+
+		$('form').change(function(){
+			page = 1;
+			filter();
+		})
+
+		$('form').submit(function(e){
+			e.preventDefault();
+		})
+	</script>
+</html>
